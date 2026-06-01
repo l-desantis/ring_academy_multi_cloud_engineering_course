@@ -1,0 +1,15 @@
+# Apply this AFTER promoting v2 to 100% to simulate a bad release:
+#   kubectl apply -f fault-injection.yaml
+# 50% of calls to v2 now return HTTP 500. Watch the loadgen stream show errors.
+# Then roll back by re-applying virtual-service.yaml with v1 = 100, v2 = 0.
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata: { name: payment-service }
+spec:
+  hosts: [ payment-service ]
+  http:
+  - fault:
+      abort: { httpStatus: 500, percentage: { value: 50 } }
+    route:
+    - destination: { host: payment-service, subset: v2 }
+      weight: 100
