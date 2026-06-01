@@ -1,0 +1,21 @@
+# This is THE LEVER. Editing the weights below and running
+#   kubectl apply -f virtual-service.yaml
+# shifts live traffic between v1 (stable) and v2 (canary) — no redeploy, no restart.
+#
+# Phase 1 (launch):    v1 = 90, v2 = 10
+# Phase 2 (promote):   v1 = 50, v2 = 50
+# Phase 3 (full):      v1 = 0,  v2 = 100
+# Rollback:            v1 = 100, v2 = 0
+#
+# Fill in each phase by editing the two weight values, then re-apply. Watch loadgen.
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata: { name: payment-service }
+spec:
+  hosts: [ payment-service ]
+  http:
+  - route:
+    - destination: { host: payment-service, subset: v1 }
+      weight: # TODO: stable weight for the current phase
+    - destination: { host: payment-service, subset: v2 }
+      weight: # TODO: canary weight for the current phase

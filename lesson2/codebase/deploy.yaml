@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service
+  labels: { app: payment-service }
+spec:
+  selector: { app: payment-service }
+  ports:
+  - name: http          # name MUST start with "http" for Istio routing
+    port: 5000
+    targetPort: 5000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: payment-service-v1 }
+spec:
+  replicas: 3                       # stable carries the load
+  selector:
+    matchLabels: { app: payment-service, version: v1 }
+  template:
+    metadata:
+      labels: { app: payment-service, version: v1 }
+    spec:
+      containers:
+      - name: payment-service
+        image: docker.io/istio/examples-helloworld-v1
+        ports: [{ containerPort: 5000 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: payment-service-v2 }
+spec:
+  replicas: 1                       # canary needs only 1 pod...
+  selector:
+    matchLabels: { app: payment-service, version: v2 }
+  template:
+    metadata:
+      labels: { app: payment-service, version: v2 }
+    spec:
+      containers:
+      - name: payment-service
+        image: docker.io/istio/examples-helloworld-v2
+        ports: [{ containerPort: 5000 }]
