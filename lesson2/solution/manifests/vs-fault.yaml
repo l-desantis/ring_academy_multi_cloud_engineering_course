@@ -1,0 +1,11 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata: { name: payment-service }
+spec:
+  hosts: [ payment-service ]
+  http:
+  - fault:
+      abort: { httpStatus: 500, percentage: { value: 50 } }
+    route:
+    - destination: { host: payment-service, subset: v2 }
+      weight: 100
