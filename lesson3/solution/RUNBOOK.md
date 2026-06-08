@@ -8,6 +8,10 @@
 
 > `awslocal` is a shorthand for `aws --endpoint-url http://localhost:4566`.
 > Install once: `uv tool install awscli-local  (or: pipx install awscli-local)`
+>
+> **LocalStack auth token required (free):** LocalStack v4+ requires a token.
+> Sign up at https://app.localstack.cloud, then `export LOCALSTACK_AUTH_TOKEN=<your-token>`.
+> The `setup.sh` script will fail with a clear message if the token is missing.
 
 ```bash
 # CRD is served?
