@@ -30,8 +30,7 @@ if the provider can't reach LocalStack.
 
 Pick the right ProviderConfig for your laptop and apply it:
 
-- Mac / Windows: `kubectl apply -f lesson3/solution/manifests/providerconfig-mac-windows.yaml`
-- Linux:         `kubectl apply -f lesson3/solution/manifests/providerconfig-linux.yaml`
+- All platforms: `kubectl apply -f lesson3/solution/manifests/providerconfig.yaml`
 
 Then apply the fast-poll config and wire it to the provider:
 
@@ -141,7 +140,7 @@ it. That's a provisioning-path / governance problem, not a reconciliation one.
   If absent: `kubectl patch provider provider-aws-s3 --type=merge -p '{"spec":{"runtimeConfigRef":{"name":"fast-poll"}}}'`
   and wait for the provider pod to restart.
 - **Endpoint URL wrong (Linux):** `kubectl describe bucket … | tail -n 20` will
-  show connection errors. Switch to `providerconfig-linux.yaml` and re-apply.
+  show connection errors. Re-check that setup.sh ran the CoreDNS patch. If not: run steps 3-5 of setup.sh manually, then re-apply the ProviderConfig.
 - **All else fails:** play the pre-recorded 30s screen capture of the reconcile.
 
 ## Reset between runs
