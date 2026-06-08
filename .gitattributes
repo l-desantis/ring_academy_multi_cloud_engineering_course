@@ -1,0 +1,6 @@
+# Ensure shell scripts always use LF line endings (never CRLF)
+*.sh text eol=lf
+
+# Markdown and YAML use LF too
+*.md text eol=lf
+*.yaml text eol=lf
