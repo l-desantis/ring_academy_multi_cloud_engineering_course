@@ -65,9 +65,17 @@ back.
 
 ### 0. Fill the gap and apply the config
 
-Edit `codebase/providerconfig.yaml`. Replace `FILL_ME_IN` with the URL that points
-to LocalStack **as reachable from inside the Kind cluster** (NOT from your laptop —
-read the hint comment in the file).
+Edit `codebase/providerconfig.yaml`. Replace `FILL_ME_IN` with:
+
+```
+http://s3.localhost.localstack.cloud:4566
+```
+
+> **Why this URL?** S3 uses virtual-hosted-style addressing — bucket names become
+> subdomains (e.g. `my-multicloud-bucket.s3.localhost.localstack.cloud`). LocalStack
+> recognises the `*.s3.localhost.localstack.cloud` pattern and extracts the bucket name
+> correctly. `setup.sh` already patched CoreDNS so this domain resolves to the
+> LocalStack container inside the cluster.
 
 ```bash
 kubectl apply -f codebase/providerconfig.yaml

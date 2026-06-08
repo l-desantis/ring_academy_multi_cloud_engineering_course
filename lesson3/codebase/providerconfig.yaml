@@ -13,9 +13,9 @@ spec:
     url:
       type: Static
       # TODO (student): point this at LocalStack as reachable FROM INSIDE the Kind cluster.
-      # Hint: inside Kind, `localhost:4566` is the Kind node, NOT your laptop.
-      # - Mac / Windows (Docker Desktop): http://host.docker.internal:4566
-      # - Linux: use the Docker bridge IP, e.g. http://172.17.0.1:4566
+      # Use the LocalStack-compatible S3 domain so virtual-hosted-style bucket URLs resolve:
+      #   http://s3.localhost.localstack.cloud:4566
+      # (setup.sh patches CoreDNS so *.s3.localhost.localstack.cloud → LocalStack container IP)
       static: "FILL_ME_IN"
     services: [s3]
     hostnameImmutable: true
