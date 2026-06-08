@@ -1,7 +1,3 @@
-# The correct endpoint for LocalStack inside Kind.
-# s3.localhost.localstack.cloud is LocalStack's own domain for virtual-hosted-style S3.
-# setup.sh patches CoreDNS so *.s3.localhost.localstack.cloud resolves to the
-# LocalStack container IP on the Kind network — works on Mac, Windows, and Linux.
 apiVersion: aws.upbound.io/v1beta1
 kind: ProviderConfig
 metadata:
@@ -16,6 +12,11 @@ spec:
   endpoint:
     url:
       type: Static
-      static: http://s3.localhost.localstack.cloud:4566
+      # s3.localhost.localstack.cloud is LocalStack's own domain for S3 virtual-hosted-style.
+      # S3 prepends bucket names as subdomains (e.g. my-bucket.s3.localhost.localstack.cloud),
+      # and LocalStack recognises this pattern to extract the bucket name correctly.
+      # setup.sh patches CoreDNS so *.s3.localhost.localstack.cloud resolves to the
+      # LocalStack container IP inside the Kind cluster.
+      static: "http://s3.localhost.localstack.cloud:4566"
     services: [s3]
     hostnameImmutable: true
