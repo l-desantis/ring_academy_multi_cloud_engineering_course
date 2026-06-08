@@ -16,7 +16,7 @@ Kubernetes (`kind`) + [Crossplane](https://www.crossplane.io/) v2 core + Upbound
 `provider-aws-s3` + LocalStack + `awslocal` CLI (shorthand for `aws --endpoint-url http://localhost:4566`).
 
 ```bash
-pip install awscli-local   # one-time install
+pipx install awscli-local   # one-time install (pipx manages the venv for you)
 ```
 
 ---
