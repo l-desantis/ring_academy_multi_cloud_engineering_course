@@ -2,12 +2,10 @@
 # Lesson 3 pre-lab setup: Kind + LocalStack + Crossplane core + provider-aws-s3 + creds secret.
 # Run ONCE before the lab. Re-runs will warn on existing resources but won't break.
 # After this finishes, you still need to:
-#   1. Fill the endpoint URL gap in codebase/providerconfig.yaml
-#      Answer: http://s3.localhost.localstack.cloud:4566
-#   2. kubectl apply -f codebase/providerconfig.yaml
-#   3. kubectl apply -f codebase/runtimeconfig.yaml
-#   4. kubectl patch provider provider-aws-s3 --type=merge -p '{"spec":{"runtimeConfigRef":{"name":"fast-poll"}}}'
-#   5. kubectl apply -f codebase/bucket.yaml
+#   1. kubectl apply -f codebase/providerconfig.yaml
+#   2. kubectl apply -f codebase/runtimeconfig.yaml
+#   3. kubectl patch provider provider-aws-s3 --type=merge -p '{"spec":{"runtimeConfigRef":{"name":"fast-poll"}}}'
+#   4. kubectl apply -f codebase/bucket.yaml
 # See EXERCISE.md.
 #
 # PREREQUISITE: LocalStack v4+ requires a free auth token.
@@ -81,9 +79,7 @@ kubectl apply -f "$HERE/aws-creds-secret.yaml"
 
 echo
 echo "Setup complete. Next:"
-echo "  1. Edit lesson3/codebase/providerconfig.yaml — replace FILL_ME_IN with:"
-echo "       http://s3.localhost.localstack.cloud:4566"
-echo "  2. kubectl apply -f lesson3/codebase/providerconfig.yaml"
-echo "  3. kubectl apply -f lesson3/codebase/runtimeconfig.yaml"
-echo "  4. kubectl patch provider provider-aws-s3 --type=merge -p '{\"spec\":{\"runtimeConfigRef\":{\"name\":\"fast-poll\"}}}'"
-echo "  5. kubectl apply -f lesson3/codebase/bucket.yaml"
+echo "  1. kubectl apply -f lesson3/codebase/providerconfig.yaml"
+echo "  2. kubectl apply -f lesson3/codebase/runtimeconfig.yaml"
+echo "  3. kubectl patch provider provider-aws-s3 --type=merge -p '{\"spec\":{\"runtimeConfigRef\":{\"name\":\"fast-poll\"}}}'"
+echo "  4. kubectl apply -f lesson3/codebase/bucket.yaml"
