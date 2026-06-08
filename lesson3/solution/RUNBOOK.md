@@ -7,7 +7,7 @@
 ## Pre-flight (do this 5 min before students arrive)
 
 > `awslocal` is a shorthand for `aws --endpoint-url http://localhost:4566`.
-> Install once: `pipx install awscli-local`
+> Install once: `uv tool install awscli-local  (or: pipx install awscli-local)`
 
 ```bash
 # CRD is served?
