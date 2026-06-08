@@ -29,7 +29,16 @@ Pick the right ProviderConfig for your laptop and apply it:
 - Mac / Windows: `kubectl apply -f lesson3/solution/manifests/providerconfig-mac-windows.yaml`
 - Linux:         `kubectl apply -f lesson3/solution/manifests/providerconfig-linux.yaml`
 
-Then: `kubectl apply -f lesson3/codebase/runtimeconfig.yaml`
+Then apply the fast-poll config and wire it to the provider:
+
+```bash
+kubectl apply -f lesson3/codebase/runtimeconfig.yaml
+kubectl patch provider provider-aws-s3 \\
+  --type=merge \\
+  -p '{"spec":{"runtimeConfigRef":{"name":"fast-poll"}}}'
+# verify:
+kubectl get provider provider-aws-s3 -o yaml | grep -A1 runtimeConfigRef
+```
 
 ## Step 1 — Declare a resource via YAML (3 min)
 
