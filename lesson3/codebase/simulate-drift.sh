@@ -2,7 +2,7 @@
 # Deletes the bucket directly on the "cloud" (LocalStack), bypassing Crossplane,
 # to simulate someone "just fixing one thing" in the console. Run from the HOST
 # (not inside the Kind cluster).
-# Requires: pipx install awscli-local
+# Requires: uv tool install awscli-local  (or: pipx install awscli-local)
 
 set -euo pipefail
 
