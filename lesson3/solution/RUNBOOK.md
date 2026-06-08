@@ -16,10 +16,13 @@ kubectl explain bucket.s3.aws.upbound.io --recursive | head
 awslocal s3 ls
 # Provider Healthy?
 kubectl get provider provider-aws-s3
+# INSTALLED=True  HEALTHY=True  ← must see both before starting
 ```
 
-All three must succeed. If LocalStack is unreachable, `docker start localstack`.
-If the provider isn't Healthy, `kubectl describe provider provider-aws-s3 | tail`.
+If LocalStack is unreachable, `docker start localstack`.
+If the provider isn't `HEALTHY`, `kubectl describe provider provider-aws-s3 | tail -n 20` and wait.
+**Do not start the demo until the provider is HEALTHY** — students can't watch the bucket reconcile
+if the provider can't reach LocalStack.
 
 Pick the right ProviderConfig for your laptop and apply it:
 
@@ -32,13 +35,23 @@ Then: `kubectl apply -f lesson3/codebase/runtimeconfig.yaml`
 
 ```bash
 kubectl apply -f lesson3/codebase/bucket.yaml
+```
+
+Open **two terminals side by side** — this is the visual payoff:
+
+```bash
+# Terminal 1 — Kubernetes side
 kubectl get bucket my-multicloud-bucket -w
 # wait for SYNCED=True  READY=True
+
+# Terminal 2 — "Cloud" side, auto-refreshes every 2s
+watch -n 2 awslocal s3 ls
 ```
 
 **Talk track:** *No AWS Console. No `terraform apply`. Just a Kubernetes object.*
 `SYNCED` means Crossplane has matched the cloud to your spec; `READY` means the
-cloud resource reports healthy.
+cloud resource reports healthy. Notice the bucket appears in Terminal 2 the moment
+`SYNCED` goes `True` — that's the controller talking to LocalStack.
 
 **Version note** (in case someone asks): this uses the cluster-scoped
 `s3.aws.upbound.io/v1beta1` group — fully supported on Crossplane v2, chosen for
@@ -48,9 +61,14 @@ maturity tag, independent of the Crossplane engine being v2.
 
 ## Step 2 — Simulate drift (4 min)
 
+Keep both terminals open. In a **third terminal**:
+
 ```bash
 bash lesson3/codebase/simulate-drift.sh
 ```
+
+Point at Terminal 2 as the bucket vanishes from `watch awslocal s3 ls`.
+Point at Terminal 1 as `SYNCED` flips to `False`. Start a visible stopwatch.
 
 **Talk track:** This is the everyday disaster — someone with console / CLI access
 "just fixes one thing" out-of-band. Kubernetes still holds the declared truth; the
@@ -59,17 +77,19 @@ cloud no longer matches it. In a Terraform shop, nobody finds out until the next
 
 ## Step 3 — Watch reconciliation (5 min)
 
+No commands needed — keep watching both terminals:
+
 ```bash
-kubectl get bucket my-multicloud-bucket -w
+# Terminal 1:
 # SYNCED=False  ← controller detects the cloud no longer matches the spec
 # SYNCED=True   ← bucket recreated automatically (within the poll interval)
+# Terminal 2: bucket reappears in awslocal s3 ls
 ```
 
-Show the evidence:
+Stop the stopwatch when `SYNCED` flips back to `True`. Then show the event log:
 
 ```bash
 kubectl describe bucket my-multicloud-bucket | tail -n 20
-awslocal s3 ls
 ```
 
 **Talk track:** Nobody ran a command to fix this. The controller's watch loop
@@ -103,8 +123,8 @@ it. That's a provisioning-path / governance problem, not a reconciliation one.
 
 ## Fallbacks
 
-- **Reconcile takes > 60s:** the `fast-poll` runtimeconfig isn't actually wired to
-  the provider. Verify with `kubectl get provider provider-aws-s3 -o yaml | grep -A1 runtimeConfigRef`.
+- **Provider not HEALTHY / bucket won't reconcile:** check the provider is actually
+  referencing the fast-poll config: `kubectl get provider provider-aws-s3 -o yaml | grep -A1 runtimeConfigRef`.
   If absent: `kubectl patch provider provider-aws-s3 --type=merge -p '{"spec":{"runtimeConfigRef":{"name":"fast-poll"}}}'`
   and wait for the provider pod to restart.
 - **Endpoint URL wrong (Linux):** `kubectl describe bucket … | tail -n 20` will
