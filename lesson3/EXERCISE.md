@@ -19,6 +19,14 @@ Kubernetes (`kind`) + [Crossplane](https://www.crossplane.io/) v2 core + Upbound
 uv tool install awscli-local   # one-time install (or: pipx install awscli-local)
 ```
 
+> **LocalStack auth token required (free):** LocalStack v4+ requires a token even
+> for the community edition. Sign up at [app.localstack.cloud](https://app.localstack.cloud),
+> grab your token, then:
+> ```bash
+> export LOCALSTACK_AUTH_TOKEN=<your-token>
+> ```
+> Add it to your `~/.bashrc` / `~/.zshrc` so you don't have to repeat it.
+
 ---
 
 ## Fast setup — do this BEFORE class (~5–10 min, mostly image pulls)
@@ -80,7 +88,7 @@ it, drift will heal eventually but you'll be waiting in silence.
 Verify it's wired up (provider pod will restart briefly):
 
 ```bash
-kubectl get provider provider-aws-s3 -o yaml | grep -A1 runtimeConfigRef
+kubectl get provider provider-aws-s3 -o yaml | grep -A4 runtimeConfigRef
 # runtimeConfigRef:
 #   name: fast-poll  ← expected
 ```
