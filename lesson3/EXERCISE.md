@@ -13,7 +13,11 @@ within the reconcile interval, with no human in the loop.
 
 ## Stack
 Kubernetes (`kind`) + [Crossplane](https://www.crossplane.io/) v2 core + Upbound
-`provider-aws-s3` + LocalStack + `aws` CLI (for the drift step).
+`provider-aws-s3` + LocalStack + `awslocal` CLI (shorthand for `aws --endpoint-url http://localhost:4566`).
+
+```bash
+pip install awscli-local   # one-time install
+```
 
 ---
 
@@ -67,7 +71,7 @@ If `SYNCED` stays `False` for more than ~60s, your endpoint URL is wrong. `Ctrl-
 Confirm on the "cloud" side:
 
 ```bash
-aws --endpoint-url http://localhost:4566 s3 ls
+awslocal s3 ls
 # my-multicloud-bucket  ← here
 ```
 
@@ -92,7 +96,7 @@ When `SYNCED` flips back to `True`, **stop the stopwatch**. Then:
 
 ```bash
 kubectl describe bucket my-multicloud-bucket | tail -n 20
-aws --endpoint-url http://localhost:4566 s3 ls   # bucket is back
+awslocal s3 ls   # bucket is back
 ```
 
 ### 4. Fill in `WORKSHEET.md`
