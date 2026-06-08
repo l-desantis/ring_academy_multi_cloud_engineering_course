@@ -63,7 +63,26 @@ read the hint comment in the file).
 
 ```bash
 kubectl apply -f codebase/providerconfig.yaml
-kubectl apply -f codebase/runtimeconfig.yaml   # 15s reconcile, so drift heals on screen
+```
+
+Now apply the fast-poll config and **wire it to the provider**:
+
+```bash
+kubectl apply -f codebase/runtimeconfig.yaml
+kubectl patch provider provider-aws-s3 \
+  --type=merge \
+  -p '{"spec":{"runtimeConfigRef":{"name":"fast-poll"}}}'
+```
+
+This tells the provider pod to poll every 15s instead of the default ~60s — without
+it, drift will heal eventually but you'll be waiting in silence.
+
+Verify it's wired up (provider pod will restart briefly):
+
+```bash
+kubectl get provider provider-aws-s3 -o yaml | grep -A1 runtimeConfigRef
+# runtimeConfigRef:
+#   name: fast-poll  ← expected
 ```
 
 ### 1. Declare the bucket
