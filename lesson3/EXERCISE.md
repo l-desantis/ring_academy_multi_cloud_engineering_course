@@ -33,6 +33,16 @@ bash codebase/setup.sh
 Wait until the script's `kubectl wait` returns. If it times out, re-run — image pulls
 on a slow network can exceed 5 min.
 
+**Verify the provider is ready before continuing:**
+
+```bash
+kubectl get provider provider-aws-s3
+# INSTALLED=True  HEALTHY=True  ← must see both before proceeding
+```
+
+If `HEALTHY` is `False`, wait 30s and retry. If still failing:
+`kubectl describe provider provider-aws-s3 | tail -n 20`
+
 **No time to set up?** You can still complete the worksheet by reading the manifests.
 
 ---
@@ -60,43 +70,49 @@ kubectl apply -f codebase/runtimeconfig.yaml   # 15s reconcile, so drift heals o
 
 ```bash
 kubectl apply -f codebase/bucket.yaml
+```
+
+Open **two terminals** side by side for the full picture:
+
+```bash
+# Terminal 1 — Kubernetes side
 kubectl get bucket my-multicloud-bucket -w
 # wait for:  SYNCED=True   READY=True
+
+# Terminal 2 — "Cloud" side (LocalStack), refreshes every 2s
+watch -n 2 awslocal s3 ls
 ```
 
 If `SYNCED` stays `False` for more than ~60s, your endpoint URL is wrong. `Ctrl-C`,
 `kubectl describe bucket my-multicloud-bucket | tail -n 20`, fix
 `providerconfig.yaml`, `kubectl apply` it again.
 
-Confirm on the "cloud" side:
-
-```bash
-awslocal s3 ls
-# my-multicloud-bucket  ← here
-```
-
 ### 2. Simulate drift (delete the bucket out-of-band)
+
+Keep both terminals open. In a third terminal:
 
 ```bash
 bash codebase/simulate-drift.sh
 ```
 
-The bucket is now gone from LocalStack but Kubernetes still holds the declared
-truth. **Start a stopwatch.**
+Watch Terminal 2 (`watch awslocal s3 ls`) — the bucket vanishes.
+Watch Terminal 1 (`kubectl get -w`) — `SYNCED` flips to `False`. **Start a stopwatch.**
 
 ### 3. Watch reconciliation
 
+Keep watching both terminals — no commands needed:
+
 ```bash
-kubectl get bucket my-multicloud-bucket -w
+# Terminal 1 shows:
 # SYNCED=False  ← controller detects divergence
 # SYNCED=True   ← bucket recreated automatically (within the poll interval)
+# Terminal 2 shows the bucket reappear in awslocal s3 ls
 ```
 
-When `SYNCED` flips back to `True`, **stop the stopwatch**. Then:
+When `SYNCED` flips back to `True`, **stop the stopwatch**. Then show the event log:
 
 ```bash
 kubectl describe bucket my-multicloud-bucket | tail -n 20
-awslocal s3 ls   # bucket is back
 ```
 
 ### 4. Fill in `WORKSHEET.md`
