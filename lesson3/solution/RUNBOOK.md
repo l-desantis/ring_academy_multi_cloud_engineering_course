@@ -6,11 +6,14 @@
 
 ## Pre-flight (do this 5 min before students arrive)
 
+> `awslocal` is a shorthand for `aws --endpoint-url http://localhost:4566`.
+> Install once: `pip install awscli-local`
+
 ```bash
 # CRD is served?
 kubectl explain bucket.s3.aws.upbound.io --recursive | head
 # LocalStack reachable from the host?
-aws --endpoint-url http://localhost:4566 s3 ls
+awslocal s3 ls
 # Provider Healthy?
 kubectl get provider provider-aws-s3
 ```
@@ -66,7 +69,7 @@ Show the evidence:
 
 ```bash
 kubectl describe bucket my-multicloud-bucket | tail -n 20
-aws --endpoint-url http://localhost:4566 s3 ls
+awslocal s3 ls
 ```
 
 **Talk track:** Nobody ran a command to fix this. The controller's watch loop
@@ -112,5 +115,5 @@ it. That's a provisioning-path / governance problem, not a reconciliation one.
 
 ```bash
 kubectl delete -f lesson3/codebase/bucket.yaml || true
-aws --endpoint-url http://localhost:4566 s3 rb s3://my-multicloud-bucket || true
+awslocal s3 rb s3://my-multicloud-bucket || true
 ```
