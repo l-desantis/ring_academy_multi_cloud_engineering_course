@@ -12,10 +12,11 @@ spec:
   endpoint:
     url:
       type: Static
-      # TODO (student): point this at LocalStack as reachable FROM INSIDE the Kind cluster.
-      # Use the LocalStack-compatible S3 domain so virtual-hosted-style bucket URLs resolve:
-      #   http://s3.localhost.localstack.cloud:4566
-      # (setup.sh patches CoreDNS so *.s3.localhost.localstack.cloud → LocalStack container IP)
-      static: "FILL_ME_IN"
+      # s3.localhost.localstack.cloud is LocalStack's own domain for S3 virtual-hosted-style.
+      # S3 prepends bucket names as subdomains (e.g. my-bucket.s3.localhost.localstack.cloud),
+      # and LocalStack recognises this pattern to extract the bucket name correctly.
+      # setup.sh patches CoreDNS so *.s3.localhost.localstack.cloud resolves to the
+      # LocalStack container IP inside the Kind cluster.
+      static: "http://s3.localhost.localstack.cloud:4566"
     services: [s3]
     hostnameImmutable: true

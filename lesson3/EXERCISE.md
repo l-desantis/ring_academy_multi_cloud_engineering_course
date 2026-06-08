@@ -58,28 +58,19 @@ If `HEALTHY` is `False`, wait 30s and retry. If still failing:
 ## Your task
 
 The cluster is up but **no `ProviderConfig` is applied yet** — so Crossplane has
-nowhere to send S3 calls. Open `codebase/providerconfig.yaml`: the structure is
-there, but `spec.endpoint.url.static` is `FILL_ME_IN`. You will fill it in, apply,
-then declare the bucket, then delete it out-of-band and watch Crossplane bring it
-back.
+nowhere to send S3 calls. You will apply it, declare the bucket, delete it
+out-of-band, and watch Crossplane bring it back.
 
-### 0. Fill the gap and apply the config
-
-Edit `codebase/providerconfig.yaml`. Replace `FILL_ME_IN` with:
-
-```
-http://s3.localhost.localstack.cloud:4566
-```
-
-> **Why this URL?** S3 uses virtual-hosted-style addressing — bucket names become
-> subdomains (e.g. `my-multicloud-bucket.s3.localhost.localstack.cloud`). LocalStack
-> recognises the `*.s3.localhost.localstack.cloud` pattern and extracts the bucket name
-> correctly. `setup.sh` already patched CoreDNS so this domain resolves to the
-> LocalStack container inside the cluster.
+### 0. Apply the configs
 
 ```bash
 kubectl apply -f codebase/providerconfig.yaml
 ```
+
+> **Why `s3.localhost.localstack.cloud`?** S3 uses virtual-hosted-style addressing —
+> bucket names become subdomains (e.g. `my-bucket.s3.localhost.localstack.cloud`).
+> LocalStack recognises this domain pattern and extracts the bucket name correctly.
+> `setup.sh` already patched CoreDNS so this domain resolves to LocalStack inside the cluster.
 
 Now apply the fast-poll config and **wire it to the provider**:
 
