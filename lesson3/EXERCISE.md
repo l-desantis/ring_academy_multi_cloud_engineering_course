@@ -113,3 +113,20 @@ A terminal screenshot (or screen recording) showing the full arc with timestamps
 4. Your measured **time-to-convergence** between the two `SYNCED` transitions.
 
 Plus your completed `WORKSHEET.md`.
+
+---
+
+## Cleanup
+
+When you're done, tear down the environment:
+
+```bash
+# Remove the bucket from Kubernetes (Crossplane will delete it from LocalStack too)
+kubectl delete -f codebase/bucket.yaml
+
+# Delete the Kind cluster (removes all Crossplane state)
+kind delete cluster --name xplane-demo
+
+# Stop and remove LocalStack
+docker rm -f localstack
+```
